@@ -1,0 +1,25 @@
+{
+  "name": "@creativechain-fdn/creary-tools",
+  "version": "0.0.1",
+  "description": "Creary commands for blockchain",
+  "main": "index.js",
+  "bin": {
+    "creary": "bin/creary.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "creary",
+    "commands",
+    "blockchain",
+    "crea"
+  ],
+  "author": "Creativechain FDN",
+  "license": "MIT",
+  "dependencies": {
+    "@creativechain-fdn/crea-js": "^0.1.2",
+    "commander": "^2.19.0",
+    "mysql": "^2.16.0"
+  }
+}
