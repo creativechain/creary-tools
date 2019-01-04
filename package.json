@@ -9,6 +9,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/creativechain/creary-tools.git"
+  },
   "keywords": [
     "creary",
     "commands",
@@ -17,6 +21,10 @@
   ],
   "author": "Creativechain FDN",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/creativechain/creary-tools/issues"
+  },
+  "homepage": "https://github.com/creativechain/creary-tools#readme",
   "dependencies": {
     "@creativechain-fdn/crea-js": "^0.1.2",
     "commander": "^2.19.0",
