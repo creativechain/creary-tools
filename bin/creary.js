@@ -38,6 +38,7 @@ program.command('new-account <creator> <wif> <user> <active> <posting> <memo> <o
     .description('Create new Blockchain account')
     .action(function (creator, wif, user, active, posting, memo, owner, json, fee, cgy) {
 
+        let wait = true;
         let fn = async function () {
 
             //console.log(creator, wif, user, active, posting, memo, owner, json, fee);
@@ -54,10 +55,17 @@ program.command('new-account <creator> <wif> <user> <active> <posting> <memo> <o
                 }
             }
 
+            wait = false;
+
         };
 
         fn();
 
+        while (wait) {
+            if (!wait) {
+                break
+            }
+        }
 
     });
 
