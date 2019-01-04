@@ -38,24 +38,27 @@ program.command('new-account <creator> <wif> <user> <active> <posting> <memo> <o
     .description('Create new Blockchain account')
     .action(function (creator, wif, user, active, posting, memo, owner, json, fee, cgy) {
 
-        //console.log(creator, wif, user, active, posting, memo, owner, json, fee);
-        crea.broadcast.accountCreate(wif, fee, creator, user, createAuth(owner),
-            createAuth(active), createAuth(posting), memo, json, function (err, result) {
+        let fn = async function () {
 
-                if (err) {
-                    console.error(err);
-                } else {
-                    console.log(result);
+            //console.log(creator, wif, user, active, posting, memo, owner, json, fee);
+            let r = await crea.broadcast.accountCreateAsync(wif, fee, creator, user, createAuth(owner),
+                createAuth(active), createAuth(posting), memo, json);
 
-                    crea.broadcast.transferToVesting(wif, creator, user, cgy, function (err, result) {
-                        if (err) {
-                            console.error(err);
-                        } else {
-                            console.log(result);
-                        }
-                    })
+            if (r) {
+                console.log(r);
+
+                r = await crea.broadcast.transferToVestingAsync(wif, creator, user, cgy);
+
+                if (r) {
+                    console.log(r);
                 }
-            })
+            }
+
+        };
+
+        fn();
+
+
     });
 
 //SEARCHER COMMAND
