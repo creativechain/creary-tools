@@ -4,10 +4,14 @@ The JavaScript utilities for management Crea Blockchain Data
 ### Documentation
 
 #### Install
-```$ npm install -g creary-tools ```
+```bash 
+$ npm install -g creary-tools 
+```
 
 #### Create account
-``` creary new-account <creator> <wif> <user> <active> <posting> <memo> <owner> <json> <fee> <cgy>```
+```bash
+$ creary new-account creator wif user active posting memo owner json fee cgy
+```
 
 ###### Parameters
 - **creator**: Username of creator.
@@ -22,7 +26,9 @@ The JavaScript utilities for management Crea Blockchain Data
 - **cgy**: Amount to Energize to new account. 
 
 #### Store Comment data
-``` creary store-blocks <host> <user> <password> <database> <block>```
+```bash 
+$ creary store-blocks host user password database block
+```
 
 ###### Parameters
 - **host**: MySQL Database host.
