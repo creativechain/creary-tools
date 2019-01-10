@@ -4,6 +4,11 @@ let crea = require('@creativechain-fdn/crea-js');
 let program = require('commander');
 let mysql = require('mysql');
 
+function sleep(delay) {
+    let start = new Date().getTime();
+    while (new Date().getTime() < start + delay);
+}
+
 function createAuth(key) {
     return {
         weight_threshold: 1,
@@ -16,7 +21,7 @@ function createAuth(key) {
 
 function setOptions() {
     let apiOptions = {
-        url: 'https://crea.owldevelopers.site',
+        nodes: ["https://node1.creary.net", "https://crea.owldevelopers.site"],
         addressPrefix: 'CREA',
         chainId: '0000000000000000000000000000000000000000000000000000000000000000',
     };
@@ -156,6 +161,8 @@ program.command('store-blocks <host> <user> <password> <database> <block>')
                             });
 
                             block++;
+                        } else {
+                            sleep(3000);
                         }
                     };
 

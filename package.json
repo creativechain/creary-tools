@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/creativechain/creary-tools#readme",
   "dependencies": {
-    "@creativechain-fdn/crea-js": "^0.1.2",
+    "@creativechain-fdn/crea-js": "^0.1.4",
     "commander": "^2.19.0",
     "mysql": "^2.16.0"
   }
