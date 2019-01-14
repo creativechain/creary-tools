@@ -21,7 +21,7 @@ function createAuth(key) {
 
 function setOptions() {
     let apiOptions = {
-        nodes: ["https://node1.creary.net", "https://crea.owldevelopers.site"],
+        nodes: ["https://node1.creary.net"],
         addressPrefix: 'CREA',
         chainId: '0000000000000000000000000000000000000000000000000000000000000000',
     };
