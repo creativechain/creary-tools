@@ -83,7 +83,7 @@ program.command('store-blocks <host> <user> <password> <database> <block>')
                         let txs = p.transactions;
                         let timestamp = new Date(p.timestamp);
 
-                        console.log('Block', block, 'with', txs.length, ' operations' );
+                        console.log('Block', block, '(' + p.block_id + ')', 'with', txs.length, ' operations');
                         txs.forEach(function (tx) {
                             let operations = tx.operations;
 
