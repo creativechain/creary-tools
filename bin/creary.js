@@ -21,7 +21,7 @@ function createAuth(key) {
 
 function setOptions() {
     let apiOptions = {
-        nodes: ["https://node1.creary.net"],
+        nodes: ['https://node1.creary.net'],
         addressPrefix: 'CREA',
         chainId: '0000000000000000000000000000000000000000000000000000000000000000',
     };
@@ -106,7 +106,13 @@ program.command('store-blocks <host> <user> <password> <database> <block>')
                                         }
 
                                         let mysqlConnection = mysql.createConnection({host, user, password, database});
-                                        mysqlConnection.connect();
+                                        mysqlConnection.connect(function (err) {
+                                            if (err) {
+                                                console.log(err);
+                                                throw err;
+                                            }
+                                        });
+
                                         mysqlConnection.query('SELECT * FROM crea_content WHERE author = ? AND permlink = ?', [author, permlink], function (error, results, fields) {
                                             if (error) {
                                                 console.log(error);
@@ -150,11 +156,13 @@ program.command('store-blocks <host> <user> <password> <database> <block>')
                                                     if (err) {
                                                         console.error(err);
                                                     }
+                                                    mysqlConnection.end();
+
                                                 });
                                             }
                                         });
 
-                                        mysqlConnection.destroy();
+
                                     }
                                 }
                             });
