@@ -19,9 +19,10 @@ function createAuth(key) {
     }
 }
 
-function setOptions() {
+function setOptions(node) {
+    node = node ? node : 'https://node1.creary.net';
     let apiOptions = {
-        nodes: ['https://node1.creary.net'],
+        nodes: [node],
         addressPrefix: 'CREA',
         chainId: '0000000000000000000000000000000000000000000000000000000000000000',
     };
@@ -32,18 +33,20 @@ function setOptions() {
     crea.config.set('address_prefix', apiOptions.addressPrefix);
 }
 
-setOptions();
-
 program
     .version('0.0.1')
-    .description('Creary Blockchain Tools');
+    .description('Creary Blockchain Tools')
+    .option('-n, --node <node>', 'Set node to connect', setOptions);
 
 //ACCOUNT CREATION COMMAND
-program.command('new-account <creator> <wif> <user> <active> <posting> <memo> <owner> <json> <fee> <cgy>')
+program.command('new-account <creator> <wif> <user> <active> <posting> <memo> <owner> <json> <cgy>')
     .description('Create new Blockchain account')
-    .action(function (creator, wif, user, active, posting, memo, owner, json, fee, cgy) {
+    .action(function (creator, wif, user, active, posting, memo, owner, json, cgy) {
 
         let fn = async function () {
+
+            let props = await crea.api.getChainPropertiesAsync();
+            let fee = props.account_creation_fee;
 
             //console.log(creator, wif, user, active, posting, memo, owner, json, fee);
             let r = await crea.broadcast.accountCreateAsync(wif, fee, creator, user, createAuth(owner),
@@ -63,6 +66,69 @@ program.command('new-account <creator> <wif> <user> <active> <posting> <memo> <o
 
         fn();
 
+    });
+
+program.command('suggest-password')
+    .description('Suggest new password')
+    .action(function () {
+        console.log('P' + crea.formatter.createSuggestedPassword())
+    });
+
+program.command('create-role-password <user> <password> <role>')
+    .description('Create password role give user and master password')
+    .option('--p, --public', 'Show public password')
+    .action(function (user, password, role, cmd) {
+        let privKeys = crea.auth.getPrivateKeys(user, password, [role]);
+
+        if (cmd.public) {
+            console.log(privKeys[role+'Pubkey']);
+        } else {
+            console.log(privKeys[role]);
+        }
+    });
+
+program.command('create-account-with-password <creator> <wif> <user> <password>')
+    .description('Create new blockchain account using given password.')
+    .action(function (creator, wif, user, password) {
+        let fn = async function () {
+
+            try {
+                let props = await crea.api.getChainPropertiesAsync();
+                let fee = props.account_creation_fee;
+
+                let roles = ['posting', 'active', 'owner', 'memo'];
+
+                let privKeys = crea.auth.getPrivateKeys(user, password, roles);
+
+                let r = await crea.broadcast.accountCreateAsync(wif, fee, creator, user, createAuth(privKeys['ownerPubkey']),
+                    createAuth(privKeys['activePubkey']), createAuth(privKeys['postingPubkey']), privKeys['memoPubkey'], '');
+
+                console.log('Account successfully created:', user)
+            } catch (e) {
+                console.error(e);
+                throw e;
+            }
+
+        };
+
+        fn();
+    });
+
+program.command('set-witness <user> <wif> <url> <sigkey> <props>')
+    .description('Create or update a witness account.')
+    .action(function (user, wif, url, sigkey, props) {
+
+        let fn = async function () {
+            try {
+                let r = await crea.broadcast.witnessUpdateAsync(wif, user, url, sigkey, JSON.parse(props), '0.000 CREA');
+                console.log('Witness successfully updated:', user)
+            } catch (e) {
+                console.error(e);
+                process.exit(1)
+            }
+        };
+
+        fn();
     });
 
 //SEARCHER COMMAND
@@ -185,5 +251,3 @@ program.command('store-blocks <host> <user> <password> <database> <block>')
     });
 
 program.parse(process.argv);
-
-
