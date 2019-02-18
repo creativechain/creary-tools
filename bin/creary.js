@@ -34,7 +34,7 @@ function setOptions(node) {
 }
 
 program
-    .version('0.0.1')
+    .version('0.2.0')
     .description('Creary Blockchain Tools')
     .option('-n, --node <node>', 'Set node to connect', setOptions);
 
