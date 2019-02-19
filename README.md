@@ -1,4 +1,4 @@
-[![npm version](https://badge.fury.io/js/%40creativechain-fdn%2Fcreary-tools.svg)](https://badge.fury.io/js/%40creativechain-fdn%2Fcreary-tools)
+[![npm version](https://badge.fury.io/js/%40creativechain-fdn%2Fcreary-tools.svg)](https://www.npmjs.com/package/@creativechain-fdn/creary-tools)
 
 # Creary Tools
 The JavaScript utilities for management Crea Blockchain Data
