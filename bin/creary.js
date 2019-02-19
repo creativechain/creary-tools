@@ -3,21 +3,8 @@
 let crea = require('@creativechain-fdn/crea-js');
 let program = require('commander');
 let mysql = require('mysql');
-
-function sleep(delay) {
-    let start = new Date().getTime();
-    while (new Date().getTime() < start + delay);
-}
-
-function createAuth(key) {
-    return {
-        weight_threshold: 1,
-        account_auths: [],
-        key_auths: [
-            [key, 1]
-        ]
-    }
-}
+let fs = require('fs');
+let util = require('../src/util');
 
 function setOptions(node) {
     node = node ? node : 'https://node1.creary.net';
@@ -34,39 +21,9 @@ function setOptions(node) {
 }
 
 program
-    .version('0.2.0')
+    .version(util.getVersion())
     .description('Creary Blockchain Tools')
     .option('-n, --node <node>', 'Set node to connect', setOptions);
-
-//ACCOUNT CREATION COMMAND
-program.command('new-account <creator> <wif> <user> <active> <posting> <memo> <owner> <json> <cgy>')
-    .description('Create new Blockchain account')
-    .action(function (creator, wif, user, active, posting, memo, owner, json, cgy) {
-
-        let fn = async function () {
-
-            let props = await crea.api.getChainPropertiesAsync();
-            let fee = props.account_creation_fee;
-
-            //console.log(creator, wif, user, active, posting, memo, owner, json, fee);
-            let r = await crea.broadcast.accountCreateAsync(wif, fee, creator, user, createAuth(owner),
-                createAuth(active), createAuth(posting), memo, json);
-
-            if (r) {
-                console.log(r);
-
-                r = await crea.broadcast.transferToVestingAsync(wif, creator, user, cgy);
-
-                if (r) {
-                    console.log(r);
-                }
-            }
-
-        };
-
-        fn();
-
-    });
 
 program.command('suggest-password')
     .description('Suggest new password')
@@ -76,7 +33,7 @@ program.command('suggest-password')
 
 program.command('create-role-password <user> <password> <role>')
     .description('Create password role give user and master password')
-    .option('--p, --public', 'Show public password')
+    .option('-p, --public', 'Show public key')
     .action(function (user, password, role, cmd) {
         let privKeys = crea.auth.getPrivateKeys(user, password, [role]);
 
@@ -87,32 +44,6 @@ program.command('create-role-password <user> <password> <role>')
         }
     });
 
-program.command('create-account-with-password <creator> <wif> <user> <password>')
-    .description('Create new blockchain account using given password.')
-    .action(function (creator, wif, user, password) {
-        let fn = async function () {
-
-            try {
-                let props = await crea.api.getChainPropertiesAsync();
-                let fee = props.account_creation_fee;
-
-                let roles = ['posting', 'active', 'owner', 'memo'];
-
-                let privKeys = crea.auth.getPrivateKeys(user, password, roles);
-
-                let r = await crea.broadcast.accountCreateAsync(wif, fee, creator, user, createAuth(privKeys['ownerPubkey']),
-                    createAuth(privKeys['activePubkey']), createAuth(privKeys['postingPubkey']), privKeys['memoPubkey'], '');
-
-                console.log('Account successfully created:', user)
-            } catch (e) {
-                console.error(e);
-                throw e;
-            }
-
-        };
-
-        fn();
-    });
 
 program.command('set-witness <user> <wif> <url> <sigkey> <props>')
     .description('Create or update a witness account.')
@@ -129,6 +60,32 @@ program.command('set-witness <user> <wif> <url> <sigkey> <props>')
         };
 
         fn();
+    });
+
+program.command('vote-witness <file>')
+    .description('Vote all present witnesses according a JSON File that provide witness names and active private key')
+    .action(function (file) {
+
+        let fn = async function () {
+            let content = fs.readFileSync(file, 'utf8');
+            console.log(JSON.parse(content));
+
+            let accounts = Object.keys(content);
+
+            accounts.forEach(function (a) {
+                accounts.forEach(function (o) {
+                    if (o !== a) {
+                        let privKey = accounts[a];
+                        let r = crea.broadcast.accountWitnessVoteAsync(privKey, a, o, true);
+                    }
+                })
+            });
+
+            let r = await crea.api.getDynamicGlobalPropertiesAsync();
+            console.log(r);
+        };
+
+        fn()
     });
 
 //SEARCHER COMMAND
@@ -236,7 +193,7 @@ program.command('store-blocks <host> <user> <password> <database> <block>')
 
                         block++;
                     } else {
-                        sleep(3000);
+                        util.sleep(3000);
                     }
 
 

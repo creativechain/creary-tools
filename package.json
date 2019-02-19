@@ -4,7 +4,10 @@
   "description": "Creary commands for blockchain",
   "main": "index.js",
   "bin": {
-    "creary": "bin/creary.js"
+    "creary": "bin/creary.js",
+    "crea-ex": "bin/crea-ex.js",
+    "crea-tx": "bin/crea-tx.js",
+    "crea-account": "bin/crea-account.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
