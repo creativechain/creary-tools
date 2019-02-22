@@ -27,7 +27,7 @@ function createAccount(creator, wif, user, active, posting, memo, owner) {
 
         console.log('Account created successfully!');
         if (program.cgy) {
-            console.log('Sending', cmd.cgy, 'to', user, '...');
+            console.log('Sending', program.cgy, 'to', user, '...');
             await crea.broadcast.transferToVestingAsync(wif, creator, user, program.cgy);
             console.log('Transferred', program.cgy, 'to', user, '!');
 
