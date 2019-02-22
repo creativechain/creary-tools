@@ -3,11 +3,10 @@
 let crea = require('@creativechain-fdn/crea-js');
 let program = require('commander');
 let mysql = require('mysql');
-let fs = require('fs');
 let util = require('../src/util');
 
 function setOptions(node) {
-    node = node ? node : 'https://node1.creary.net';
+    node = node ? node : 'https://crea.owldevelopers.site';
     let apiOptions = {
         nodes: [node],
         addressPrefix: 'CREA',
@@ -42,50 +41,6 @@ program.command('create-role-password <user> <password> <role>')
         } else {
             console.log(privKeys[role]);
         }
-    });
-
-
-program.command('set-witness <user> <wif> <url> <sigkey> <props>')
-    .description('Create or update a witness account.')
-    .action(function (user, wif, url, sigkey, props) {
-
-        let fn = async function () {
-            try {
-                let r = await crea.broadcast.witnessUpdateAsync(wif, user, url, sigkey, JSON.parse(props), '0.000 CREA');
-                console.log('Witness successfully updated:', user)
-            } catch (e) {
-                console.error(e);
-                process.exit(1)
-            }
-        };
-
-        fn();
-    });
-
-program.command('vote-witness <file>')
-    .description('Vote all present witnesses according a JSON File that provide witness names and active private key')
-    .action(function (file) {
-
-        let fn = async function () {
-            let content = fs.readFileSync(file, 'utf8');
-            console.log(JSON.parse(content));
-
-            let accounts = Object.keys(content);
-
-            accounts.forEach(function (a) {
-                accounts.forEach(function (o) {
-                    if (o !== a) {
-                        let privKey = accounts[a];
-                        let r = crea.broadcast.accountWitnessVoteAsync(privKey, a, o, true);
-                    }
-                })
-            });
-
-            let r = await crea.api.getDynamicGlobalPropertiesAsync();
-            console.log(r);
-        };
-
-        fn()
     });
 
 //SEARCHER COMMAND

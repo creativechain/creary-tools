@@ -29,7 +29,7 @@ program.command('transfer <from> <to> <amount> <memo> <wif>')
 
         let fn = async function () {
             try {
-                let r = crea.broadcast.transferAsync(wif, from, to, amount, memo);
+                let r = await crea.broadcast.transferAsync(wif, from, to, amount, memo);
                 console.log(r);
             } catch (e) {
                 console.error(e);
@@ -39,3 +39,5 @@ program.command('transfer <from> <to> <amount> <memo> <wif>')
 
         fn();
     });
+
+program.parse(process.argv);
