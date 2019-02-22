@@ -117,7 +117,7 @@ program.command('create-with-password <creator> <wif> <user> <password>')
     });
 
 program.command('change-password <user> <wif>')
-    .description('Create new Blockchain account')
+    .description('Change account keys')
     .option('-p, --password <password>', 'New password of account.')
     .option('-m, --metadata <metadata>', 'JSON string metadata for account')
     .action(function (user, wif, cmd) {
