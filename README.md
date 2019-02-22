@@ -8,5 +8,5 @@ You can see full documentation [here](https://github.com/creativechain/creary-to
 
 ### Install
 ```bash 
-$ npm install -g creary-tools 
+$ npm install -g @creativechain-fdn/creary-tools 
 ```
