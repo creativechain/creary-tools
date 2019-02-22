@@ -9,6 +9,10 @@ let sleep = function (delay) {
     while (new Date().getTime() < start + delay);
 };
 
+let wait = function (delay = 100) {
+    return setTimeout(wait, delay);
+};
+
 let createAuth = function(key) {
     return {
         weight_threshold: 1,
@@ -20,5 +24,5 @@ let createAuth = function(key) {
 };
 
 module.exports = {
-    getVersion, sleep, createAuth
+    getVersion, sleep, wait, createAuth
 }

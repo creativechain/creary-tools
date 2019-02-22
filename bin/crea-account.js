@@ -18,33 +18,23 @@ function setOptions(node) {
     crea.config.set('address_prefix', apiOptions.addressPrefix);
 }
 
-function createAccount(creator, wif, user, active, posting, memo, owner) {
-    let fn = async function () {
-        let fee = await getCreationFee();
+async function createAccount(creator, wif, user, active, posting, memo, owner) {
+    let fee = await getCreationFee();
+    await crea.broadcast.accountCreateAsync(wif, fee, creator, user, util.createAuth(owner),
+        util.createAuth(active), util.createAuth(posting), memo, program.metadata ? program.metadata : '');
 
-        await crea.broadcast.accountCreateAsync(wif, fee, creator, user, util.createAuth(owner),
-            util.createAuth(active), util.createAuth(posting), memo, program.metadata ? program.metadata : '');
+    console.log('Account created successfully!');
+    if (program.cgy) {
+        console.log('Sending', program.cgy, 'to', user, '...');
+        await crea.broadcast.transferToVestingAsync(wif, creator, user, program.cgy);
+        console.log('Transferred', program.cgy, 'to', user, '!');
 
-        console.log('Account created successfully!');
-        if (program.cgy) {
-            console.log('Sending', program.cgy, 'to', user, '...');
-            await crea.broadcast.transferToVestingAsync(wif, creator, user, program.cgy);
-            console.log('Transferred', program.cgy, 'to', user, '!');
-
-        }
-    };
-
-    fn();
+    }
 }
 
-function getCreationFee() {
-
-    let fn = async function () {
-        let props = await crea.api.getChainPropertiesAsync();
-        return  props.account_creation_fee;
-    };
-
-    return fn();
+async function getCreationFee() {
+    let props = await crea.api.getChainPropertiesAsync();
+    return props.account_creation_fee;
 }
 
 program
