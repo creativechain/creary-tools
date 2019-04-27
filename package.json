@@ -7,7 +7,8 @@
     "creary": "bin/creary.js",
     "crea-ex": "bin/crea-ex.js",
     "crea-tx": "bin/crea-tx.js",
-    "crea-account": "bin/crea-account.js"
+    "crea-account": "bin/crea-account.js",
+    "crea-witness": "bin/crea-witness.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -29,8 +30,8 @@
   },
   "homepage": "https://github.com/creativechain/creary-tools#readme",
   "dependencies": {
-    "@creativechain-fdn/crea-js": "^0.1.6",
-    "commander": "^2.19.0",
-    "mysql": "^2.16.0"
+    "@creativechain-fdn/crea-js": "^0.1.8",
+    "commander": "^2.20.0",
+    "mysql": "^2.17.1"
   }
 }
