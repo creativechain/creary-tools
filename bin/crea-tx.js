@@ -5,7 +5,7 @@ let program = require('commander');
 let util = require('../src/util');
 
 function setOptions(node) {
-    node = node ? node : 'https://node1.creary.net';
+    node = node ? node : 'https://nodes.creary.net';
     let apiOptions = {
         nodes: [node],
         addressPrefix: 'CREA',

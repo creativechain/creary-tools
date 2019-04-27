@@ -6,7 +6,7 @@ let mysql = require('mysql');
 let util = require('../src/util');
 
 function setOptions(node) {
-    node = node ? node : 'https://crea.owldevelopers.site';
+    node = node ? node : 'https://nodes.creary.net';
     let apiOptions = {
         nodes: [node],
         addressPrefix: 'CREA',
