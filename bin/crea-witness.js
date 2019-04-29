@@ -28,6 +28,8 @@ program.command('update <wif> <witness> <owner> <url> <signingKey> <props> <fee>
     .action(function (wif, witness, owner, url, signingKey, props, fee) {
         let fn = async function () {
             await crea.broadcast.witnessUpdateAsync(wif, owner, url, signingKey, props, fee);
+
+            console.log('Witness ' + witness + ' updated!');
         };
 
         fn();
@@ -44,10 +46,8 @@ program.command('update-price <wif> <witness>')
                 quote: '1.000 CREA'
             };
 
-            console.log(price);
-
             let response = await crea.broadcast.feedPublishAsync(wif, witness, price);
-            console.log(response)
+            console.log('Price updated!', response)
 
         };
 
