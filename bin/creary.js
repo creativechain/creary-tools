@@ -2,7 +2,7 @@
 
 let crea = require('@creativechain-fdn/crea-js');
 let program = require('commander');
-let mysql = require('mysql');
+let { execFile } = require('child_process');
 let util = require('../src/util');
 
 function setOptions(node) {
@@ -44,9 +44,11 @@ program.command('create-role-password <user> <password> <role>')
     });
 
 //SEARCHER COMMAND
-program.command('store-blocks <host> <user> <password> <database> <block>')
-    .description('Store Creary blockchain blocks in a MySQL Database')
-    .action(function (host, user, password, database, block) {
+program.command('scan-blocks <block>')
+    .description('Scan Creary blockchain blocks')
+    .option('-c, --comment-script <script>', 'Script file to execute when detect a comment')
+    .option('-r, --reblog-script <script>', 'Script file to execute when detect a reblog')
+    .action(function (block, cmd) {
 
         block = parseInt(block);
         let fn = async function () {
@@ -59,7 +61,6 @@ program.command('store-blocks <host> <user> <password> <database> <block>')
                     if (p) {
 
                         let txs = p.transactions;
-                        let timestamp = new Date(p.timestamp);
 
                         console.log('Block', block, '(' + p.block_id + ')', 'with', txs.length, ' operations');
                         txs.forEach(function (tx) {
@@ -75,72 +76,34 @@ program.command('store-blocks <host> <user> <password> <database> <block>')
                                     let permlink = opData.permlink;
                                     let author = opData.author;
                                     console.log('Processing', author, permlink);
-                                    if (!opData.parent_author) {
 
-                                        try {
-                                            opData.metadata = JSON.parse(opData.json_metadata);
-                                        } catch (e) {
-                                            console.error('Failed parsing metadata');
+                                    if (cmd.commentScript) {
+                                        if (!opData.parent_author) {
+                                            //Only comments, no responses
+
+                                            let fileScript = cmd.commentScript;
+                                            let args = [author, permlink];
+                                            execFile(fileScript, args, function (err, stderr, stdout) {
+                                                console.log(stderr)
+                                            })
                                         }
+                                    }
+                                } else if (opType === 'custom_json') {
+                                    let jsonData = JSON.parse(opData.json);
+                                    if (opData.id === 'follow') {
+                                        if (jsonData[0] === 'reblog') {
+                                            let fileScript = cmd.reblogScript;
+                                            if (fileScript) {
+                                                let reblogData = jsonData[1];
 
-                                        let mysqlConnection = mysql.createConnection({host, user, password, database});
-                                        mysqlConnection.connect(function (err) {
-                                            if (err) {
-                                                console.log(err);
-                                                throw err;
+                                                let args = [reblogData.author, reblogData.permlink, reblogData.account];
+                                                console.log(fileScript, args);
+                                                execFile(fileScript, args, function (err, stderr, stdout) {
+                                                    console.log(stderr)
+                                                })
                                             }
-                                        });
 
-                                        mysqlConnection.query('SELECT * FROM crea_content WHERE author = ? AND permlink = ?', [author, permlink], function (error, results, fields) {
-                                            if (error) {
-                                                console.log(error);
-                                            } else if (results) {
-                                                let query;
-                                                let params = [];
-                                                if (results.length) {
-                                                    //Modify
-                                                    console.log('Updating registry', author, permlink);
-                                                    query = 'UPDATE crea_content SET title = ?, license = ?, adult = ?, description = ?, tags = ? WHERE author = ? AND permlink = ?;';
-                                                } else {
-                                                    query = 'INSERT INTO crea_content (author, permlink, title, license, adult, description, tags, creation_date, hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
-                                                    params.push(author);
-                                                    params.push(permlink);
-                                                }
-
-                                                params.push(opData.title);
-
-                                                if (opData.metadata) {
-                                                    params.push(opData.metadata.license);
-                                                    params.push(opData.metadata.adult ? 1: 0);
-                                                    params.push(opData.metadata.description);
-
-                                                    try {
-                                                        params.push(JSON.stringify(opData.metadata.tags));
-                                                    } catch (e) {
-                                                        console.log('Fail encoding tags');
-                                                        params.push('[]')
-                                                    }
-                                                } else {
-                                                    params.push(-1);
-                                                    params.push(0);
-                                                    params.push('');
-                                                    params.push('');
-                                                }
-
-                                                params.push(timestamp.getTime());
-                                                params.push('');
-
-                                                mysqlConnection.query(query, params, function (err, results, fields) {
-                                                    if (err) {
-                                                        console.error(err);
-                                                    }
-                                                    mysqlConnection.end();
-
-                                                });
-                                            }
-                                        });
-
-
+                                        }
                                     }
                                 }
                             });
@@ -150,8 +113,6 @@ program.command('store-blocks <host> <user> <password> <database> <block>')
                     } else {
                         util.sleep(3000);
                     }
-
-
                 } catch (e) {
                     console.log(e);
                 }
