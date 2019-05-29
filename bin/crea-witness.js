@@ -27,7 +27,7 @@ program.command('update <wif> <witness> <owner> <url> <signingKey> <props> <fee>
     .description('Create Or Update new witness')
     .action(function (wif, witness, owner, url, signingKey, props, fee) {
         let fn = async function () {
-            await crea.broadcast.witnessUpdateAsync(wif, owner, url, signingKey, props, fee);
+            await crea.broadcast.witnessUpdateAsync(wif, owner, url, signingKey, JSON.parse(props), fee);
 
             console.log('Witness ' + witness + ' updated!');
         };
