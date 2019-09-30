@@ -1,3 +1,4 @@
+const {Asset, NAI} = require('./amount');
 
 let getVersion = function () {
     let pjson = require('../package');
@@ -23,6 +24,27 @@ let createAuth = function(key) {
     }
 };
 
+/**
+ *
+ * @param state
+ * @param creaEnergy
+ * @return {Asset}
+ */
+function cgyToVests(state, creaEnergy) {
+    var energy = creaEnergy;
+
+    if (typeof creaEnergy === 'string') {
+        energy = parseFloat(Asset.parseString(creaEnergy).toPlainString(null, false));
+    }
+
+    var total_vests = parseFloat(Asset.parseString(state.props.total_vesting_shares).toPlainString(null, false));
+    var total_vest_crea = parseFloat(Asset.parseString(state.props.total_vesting_fund_crea).toPlainString(null, false));
+    return Asset.parse({
+        amount: energy / total_vest_crea * total_vests,
+        nai: 'vests'
+    });
+}
+
 module.exports = {
-    getVersion, sleep, wait, createAuth
+    getVersion, sleep, wait, createAuth, cgyToVests
 }

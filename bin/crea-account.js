@@ -18,16 +18,25 @@ function setOptions(node) {
     crea.config.set('address_prefix', apiOptions.addressPrefix);
 }
 
-async function createAccount(creator, wif, user, active, posting, memo, owner) {
+async function createAccount(creator, wif, user, active, posting, memo, owner, delegated = true) {
     let fee = await getCreationFee();
     await crea.broadcast.accountCreateAsync(wif, fee, creator, user, util.createAuth(owner),
         util.createAuth(active), util.createAuth(posting), memo, program.metadata ? program.metadata : '');
 
     console.log('Account created successfully!');
     if (program.cgy) {
-        console.log('Sending', program.cgy, 'to', user, '...');
-        await crea.broadcast.transferToVestingAsync(wif, creator, user, program.cgy);
-        console.log('Transferred', program.cgy, 'to', user, '!');
+        if (delegated) {
+            console.log('Delegating', program.cgy, 'to', user, '...');
+            let state = await crea.api.getStateAsync(creator);
+            let delegateVests = util.cgyToVests(state, program.cgy);
+            await crea.broadcast.delegateVestingSharesAsync(wif, creator, user, delegateVests.toFriendlyString(null, false));
+            console.log('Delegated', program.cgy, 'to', user, '!');
+        } else {
+            console.log('Sending', program.cgy, 'to', user, '...');
+            await crea.broadcast.transferToVestingAsync(wif, creator, user, program.cgy);
+            console.log('Transferred', program.cgy, 'to', user, '!');
+        }
+
 
     }
 }
@@ -40,6 +49,7 @@ async function getCreationFee() {
 program
     .version(util.getVersion())
     .description('Crea Account Tools')
+    .option('-d, --delegated', 'Set if CGY is delegated')
     .option('-n, --node <node>', 'Set node to connect', setOptions)
     .option('-c, --cgy <cgy>', 'Transfer CGY to new account')
     .option('-m, --metadata <metadata>', 'JSON string metadata for user');
@@ -70,12 +80,11 @@ program.command('create <creator> <wif> <user>')
 
 program.command('create-with <creator> <wif> <user> <active> <posting> <memo> <owner>')
     .description('Create new Blockchain account with specific parameters')
-
     .action(function (creator, wif, user, active, posting, memo, owner) {
 
         let fn = async function () {
             try {
-                await createAccount(creator, wif, user, active, posting, memo, owner);
+                await createAccount(creator, wif, user, active, posting, memo, owner, program.delegated);
             } catch (e) {
                 console.error(e);
                 process.exit(1)
