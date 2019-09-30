@@ -1,6 +1,6 @@
 {
   "name": "@creativechain-fdn/creary-tools",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Creary commands for blockchain",
   "main": "index.js",
   "bin": {
