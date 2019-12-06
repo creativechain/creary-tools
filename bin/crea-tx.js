@@ -31,7 +31,7 @@ program.command('transfer <from> <to> <amount> <memo> <wif>')
         let fn = async function () {
             try {
                 let r = await crea.broadcast.transferAsync(wif, from, to, amount, memo);
-                console.log(r);
+                console.log(JSON.stringify(r));
             } catch (e) {
                 console.error(e);
                 process.exit(1);
