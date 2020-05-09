@@ -30,8 +30,10 @@
   },
   "homepage": "https://github.com/creativechain/creary-tools#readme",
   "dependencies": {
+    "-": "0.0.1",
     "@creativechain-fdn/crea-js": "^0.1.8",
     "async-mutex": "^0.1.4",
-    "commander": "^2.20.0"
+    "commander": "^2.20.0",
+    "g": "^2.0.1"
   }
 }

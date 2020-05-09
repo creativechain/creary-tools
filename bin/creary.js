@@ -149,16 +149,23 @@ program.command('handle-blocks <block>')
             while (true) {
 
                 try {
-                    if (cmd.script) {
-                        let fileScript = cmd.script;
-                        let args = [block];
-                        execFile(fileScript, args, function (err, stderr, stdout) {
-                            console.log(stderr)
-                        })
+                    let p = await crea.api.getBlockAsync(block);
+
+                    if (p) {
+                        console.log('Detected block', block, '(' + p.block_id + ')', 'with', p.transactions.length, ' operations');
+                        if (cmd.script) {
+                            let fileScript = cmd.script;
+                            let args = [block];
+                            execFile(fileScript, args, function (err, stderr, stdout) {
+                                console.log(stderr)
+                            })
+                        }
+
+                        block++;
+                    } else {
+                        util.sleep(3000);
                     }
 
-                    block++;
-                    util.sleep(3000);
                 } catch (e) {
                     console.log(e);
                 }
