@@ -138,6 +138,37 @@ function writeMetricFile(data, file) {
     fs.writeFileSync(file, JSON.stringify(data));
 }
 
+program.command('handle-blocks <block>')
+    .description('Handle Creary blockchain blocks')
+    .option('-s, --script <script>', 'Script file to execute when detect a block')
+    .action(function (block, cmd) {
+
+        block = parseInt(block);
+        let fn = async function () {
+
+            while (true) {
+
+                try {
+                    if (cmd.script) {
+                        let fileScript = cmd.script;
+                        let args = [block];
+                        execFile(fileScript, args, function (err, stderr, stdout) {
+                            console.log(stderr)
+                        })
+                    }
+
+                    block++;
+                    util.sleep(3000);
+                } catch (e) {
+                    console.log(e);
+                }
+            }
+        };
+
+        fn();
+
+    });
+
 program.command('scan-metrics <block>')
     .description('Scan Metrics Creary blockchain')
     .action(function (block, cmd) {
