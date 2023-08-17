@@ -141,6 +141,7 @@ function writeMetricFile(data, file) {
 program.command('handle-blocks <block>')
     .description('Handle Creary blockchain blocks')
     .option('-s, --script <script>', 'Script file to execute when detect a block')
+    .option('--no-empty-blocks', 'Avoid execute script when an empty block is detected')
     .action(function (block, cmd) {
 
         block = parseInt(block);
@@ -153,7 +154,10 @@ program.command('handle-blocks <block>')
 
                     if (p) {
                         console.log('Detected block', block, '(' + p.block_id + ')', 'with', p.transactions.length, ' operations');
-                        if (cmd.script) {
+
+                        let mustExecScript = cmd.script && (p.transactions.length > 0 || cmd.emptyBlocks);
+
+                        if (mustExecScript) {
                             let fileScript = cmd.script;
                             let args = [block];
                             execFile(fileScript, args, function (err, stderr, stdout) {
